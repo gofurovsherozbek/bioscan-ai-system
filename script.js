@@ -25,7 +25,7 @@ fileInput.addEventListener('change', async (e) => {
     try {
         statusText.innerHTML = 'Tizim holati: <span class="text-warning">Tahlil qilinmoqda...</span>';
         
-        const response = await fetch('http://localhost:8000/analyze', {
+        const response = await fetch('https://bioscan-ai-system.onrender.com', {
             method: 'POST',
             body: formData
         });
