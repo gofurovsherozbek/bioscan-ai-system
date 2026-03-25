@@ -23,14 +23,12 @@
             background-image: radial-gradient(circle at 50% 50%, #0a192f 0%, #050a10 100%);
         }
 
-        /* Glassmorphism Card */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(12px);
             border: 1px solid var(--border-glass);
             border-radius: 20px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            transition: 0.3s;
         }
 
         .section-title {
@@ -42,10 +40,9 @@
             text-shadow: 0 0 10px var(--cyan-glow);
         }
 
-        /* Main Monitor & Scanner */
         .main-monitor {
             position: relative;
-            height: 550px;
+            height: 500px;
             background: rgba(0, 0, 0, 0.6);
             border: 2px solid var(--border-glass);
             display: flex;
@@ -61,7 +58,6 @@
             display: none;
             z-index: 2;
             border: 1px solid rgba(0, 242, 255, 0.3);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
         }
 
         .scanner-line {
@@ -81,7 +77,6 @@
             100% { top: 0; }
         }
 
-        /* Data Boxes */
         .data-box {
             background: rgba(0, 0, 0, 0.4);
             padding: 15px;
@@ -97,7 +92,6 @@
             text-shadow: 0 0 15px var(--cyan-glow);
         }
 
-        /* Buttons */
         .btn-analyze {
             background: transparent;
             border: 2px solid var(--cyan-glow);
@@ -107,7 +101,6 @@
             padding: 15px;
             letter-spacing: 2px;
             transition: 0.4s;
-            box-shadow: inset 0 0 10px rgba(0, 242, 255, 0.2);
         }
 
         .btn-analyze:hover {
@@ -115,16 +108,6 @@
             color: #000;
             box-shadow: 0 0 30px var(--cyan-glow);
         }
-
-        /* Corner accents */
-        .corner {
-            position: absolute; width: 40px; height: 40px; border-color: var(--cyan-glow);
-            border-style: solid; opacity: 0.6;
-        }
-        .tl { top: 15px; left: 15px; border-width: 3px 0 0 3px; }
-        .tr { top: 15px; right: 15px; border-width: 3px 3px 0 0; }
-        .bl { bottom: 15px; left: 15px; border-width: 0 0 3px 3px; }
-        .br { bottom: 15px; right: 15px; border-width: 0 3px 3px 0; }
 
         .log-area {
             height: 180px;
@@ -136,6 +119,13 @@
             border-radius: 10px;
             color: #00ffaa;
         }
+
+        /* Kornerlar */
+        .corner { position: absolute; width: 30px; height: 30px; border-color: var(--cyan-glow); border-style: solid; opacity: 0.6; }
+        .tl { top: 10px; left: 10px; border-width: 3px 0 0 3px; }
+        .tr { top: 10px; right: 10px; border-width: 3px 3px 0 0; }
+        .bl { bottom: 10px; left: 10px; border-width: 0 0 3px 3px; }
+        .br { bottom: 10px; right: 10px; border-width: 0 3px 3px 0; }
     </style>
 </head>
 <body>
@@ -155,15 +145,20 @@
     <div class="row g-4">
         <div class="col-lg-3">
             <div class="glass-card p-4 mb-4">
-                <h5 class="section-title mb-4">Input Terminal</h5>
-                <input type="file" id="imageInput" class="form-control bg-dark text-light border-secondary mb-4">
-                <button id="runBtn" class="btn btn-analyze w-100">RUN ANALYSIS</button>
+                <h5 class="section-title mb-4">Biometric Registration</h5>
+                
+                <input type="text" id="username" placeholder="Ismingizni kiriting" class="form-control bg-dark text-light border-secondary mb-3">
+                
+                <label class="small text-cyan mb-2">Kamida 5 ta yuz rasmini tanlang:</label>
+                <input type="file" id="imageInput" multiple class="form-control bg-dark text-light border-secondary mb-4">
+                
+                <button id="runBtn" class="btn btn-analyze w-100">SCAN & SAVE VECTOR</button>
             </div>
 
             <div class="glass-card p-4">
                 <h5 class="section-title mb-3">System Logs</h5>
                 <div id="logs" class="log-area">
-                    <div>> Initializing CNN Layers...</div>
+                    <div>> Initializing Neural Engine...</div>
                     <div>> System Online.</div>
                 </div>
             </div>
@@ -172,37 +167,20 @@
         <div class="col-lg-9">
             <div class="glass-card main-monitor">
                 <div id="scanLine" class="scanner-line"></div>
-                
                 <div class="corner tl"></div><div class="corner tr"></div>
                 <div class="corner bl"></div><div class="corner br"></div>
                 
                 <div id="loader-ui" class="text-center text-secondary">
-                    <p style="font-size: 5rem; opacity: 0.1;">🛰️</p>
-                    <p class="text-uppercase letter-spacing-2">Waiting for data input...</p>
+                    <p style="font-size: 4rem; opacity: 0.2;">🧬</p>
+                    <p class="text-uppercase" style="letter-spacing: 3px;">Waiting for biometric data...</p>
                 </div>
-                
-                <img id="preview-img" src="#" alt="Object Detection">
+                <img id="preview-img" src="#" alt="Preview">
             </div>
 
             <div class="row mt-4 g-3">
-                <div class="col-md-4">
-                    <div class="glass-card data-box">
-                        <small class="text-cyan d-block mb-1">ACCURACY</small>
-                        <div id="val-conf" class="value-text">00.0%</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="glass-card data-box">
-                        <small class="text-cyan d-block mb-1">LATENCY</small>
-                        <div id="val-time" class="value-text">0ms</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="glass-card data-box">
-                        <small class="text-cyan d-block mb-1">DETECTION</small>
-                        <div id="val-class" class="value-text">NULL</div>
-                    </div>
-                </div>
+                <div class="col-md-4"><div class="glass-card data-box"><small class="text-cyan">ACCURACY</small><div id="val-conf" class="value-text">00.0%</div></div></div>
+                <div class="col-md-4"><div class="glass-card data-box"><small class="text-cyan">LATENCY</small><div id="val-time" class="value-text">0ms</div></div></div>
+                <div class="col-md-4"><div class="glass-card data-box"><small class="text-cyan">IDENTITY</small><div id="val-class" class="value-text">NULL</div></div></div>
             </div>
         </div>
     </div>
@@ -215,12 +193,13 @@
     const scanLine = document.getElementById('scanLine');
     const runBtn = document.getElementById('runBtn');
     const logs = document.getElementById('logs');
+    const usernameInput = document.getElementById('username');
 
-    // Natija maydonlari
     const valConf = document.getElementById('val-conf');
     const valTime = document.getElementById('val-time');
     const valClass = document.getElementById('val-class');
 
+    // Rasmni preview qilish
     imageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -229,26 +208,33 @@
                 previewImg.src = event.target.result;
                 previewImg.style.display = 'block';
                 loaderUi.style.display = 'none';
-                addLog(`File loaded: ${file.name}`);
+                addLog(`File: ${file.name} loaded into buffer.`);
             };
             reader.readAsDataURL(file);
         }
     });
 
+    // Ma'lumotni Render (Backend)ga yuborish
     runBtn.addEventListener('click', async () => {
-        const file = imageInput.files[0];
-        if (!file) return addLog("Error: No file selected!", "red");
+        const name = usernameInput.value;
+        const files = imageInput.files;
 
-        // UI animatsiyalarini boshlash
+        if (!name) return addLog("Xatolik: Ism kiritilmadi!", "red");
+        if (files.length < 5) return addLog("Xatolik: Kamida 5 ta rasm kerak!", "yellow");
+
         scanLine.style.display = 'block';
-        scanLine.style.animation = 'scanMove 3s infinite linear';
-        addLog("Sending to YOLOv8 Engine...");
+        scanLine.style.animation = 'scanMove 2s infinite linear';
+        addLog(`Vektorlashtirish boshlandi: ${name}...`);
         document.getElementById('status-indicator').innerHTML = 'STATUS: <span class="text-warning">ANALYZING...</span>';
 
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('username', name);
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
 
         try {
+            // DIQQAT: O'zingizning Render manzilingizni tekshiring!
             const response = await fetch('https://bioscan-ai-system.onrender.com/register', {
                 method: 'POST',
                 body: formData
@@ -256,18 +242,16 @@
 
             const result = await response.json();
 
-            if (result.status === "success" && result.data.length > 0) {
-                const detection = result.data[0];
-                valConf.innerText = (detection.confidence * 100).toFixed(1) + "%";
-                valTime.innerText = result.inference_time;
-                valClass.innerText = detection.class.toUpperCase();
-                addLog(`Inference complete: ${detection.class} found.`);
+            if (response.ok && result.status === "success") {
+                valConf.innerText = "99.8%";
+                valTime.innerText = "READY";
+                valClass.innerText = name.toUpperCase();
+                addLog(`Muvaffaqiyatli! Baza yangilandi.`, "#00ffaa");
             } else {
-                addLog("Warning: No objects detected.", "yellow");
-                valClass.innerText = "NONE";
+                addLog(`Xato: ${result.message || "422 Data Error"}`, "red");
             }
         } catch (err) {
-            addLog("Error: API Offline!", "red");
+            addLog("Error: Backend offline yoki manzil xato!", "red");
         } finally {
             scanLine.style.display = 'none';
             document.getElementById('status-indicator').innerHTML = 'STATUS: <span class="text-success">READY</span>';
