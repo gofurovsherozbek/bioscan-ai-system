@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioScan AI | Neural Network Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #050a10;
+            --cyan-glow: #00f2ff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(0, 242, 255, 0.15);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e0e0e0;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #0a192f 0%, #050a10 100%);
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            transition: 0.3s;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--cyan-glow);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        /* Main Monitor & Scanner */
+        .main-monitor {
+            position: relative;
+            height: 550px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #preview-img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            display: none;
+            z-index: 2;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+        }
+
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--cyan-glow), transparent);
+            box-shadow: 0 0 25px var(--cyan-glow);
+            top: 0;
+            z-index: 5;
+            display: none;
+        }
+
+        @keyframes scanMove {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+
+        /* Data Boxes */
+        .data-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px dashed var(--cyan-glow);
+            text-align: center;
+        }
+
+        .value-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 0 0 15px var(--cyan-glow);
+        }
+
+        /* Buttons */
+        .btn-analyze {
+            background: transparent;
+            border: 2px solid var(--cyan-glow);
+            color: var(--cyan-glow);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            padding: 15px;
+            letter-spacing: 2px;
+            transition: 0.4s;
+            box-shadow: inset 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        .btn-analyze:hover {
+            background: var(--cyan-glow);
+            color: #000;
+            box-shadow: 0 0 30px var(--cyan-glow);
+        }
+
+        /* Corner accents */
+        .corner {
+            position: absolute; width: 40px; height: 40px; border-color: var(--cyan-glow);
+            border-style: solid; opacity: 0.6;
+        }
+        .tl { top: 15px; left: 15px; border-width: 3px 0 0 3px; }
+        .tr { top: 15px; right: 15px; border-width: 3px 3px 0 0; }
+        .bl { bottom: 15px; left: 15px; border-width: 0 0 3px 3px; }
+        .br { bottom: 15px; right: 15px; border-width: 0 3px 3px 0; }
+
+        .log-area {
+            height: 180px;
+            background: rgba(0,0,0,0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            padding: 10px;
+            overflow-y: auto;
+            border-radius: 10px;
+            color: #00ffaa;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark m-3">
+    <div class="container-fluid glass-card p-3">
+        <a class="navbar-brand fw-bold" href="#">
+            <span style="color: var(--cyan-glow); font-family: 'Orbitron';">NEURAL</span>_BIO_SYSTEM v3.0
+        </a>
+        <div id="status-indicator" class="small text-secondary">
+            STATUS: <span class="text-success fw-bold">READY</span>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="glass-card p-4 mb-4">
+                <h5 class="section-title mb-4">Input Terminal</h5>
+                <input type="file" id="imageInput" class="form-control bg-dark text-light border-secondary mb-4">
+                <button id="runBtn" class="btn btn-analyze w-100">RUN ANALYSIS</button>
+            </div>
+
+            <div class="glass-card p-4">
+                <h5 class="section-title mb-3">System Logs</h5>
+                <div id="logs" class="log-area">
+                    <div>> Initializing CNN Layers...</div>
+                    <div>> System Online.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="glass-card main-monitor">
+                <div id="scanLine" class="scanner-line"></div>
+                
+                <div class="corner tl"></div><div class="corner tr"></div>
+                <div class="corner bl"></div><div class="corner br"></div>
+                
+                <div id="loader-ui" class="text-center text-secondary">
+                    <p style="font-size: 5rem; opacity: 0.1;">🛰️</p>
+                    <p class="text-uppercase letter-spacing-2">Waiting for data input...</p>
+                </div>
+                
+                <img id="preview-img" src="#" alt="Object Detection">
+            </div>
+
+            <div class="row mt-4 g-3">
+                <div class="col-md-4">
+                    <div class="glass-card data-box">
+                        <small class="text-cyan d-block mb-1">ACCURACY</small>
+                        <div id="val-conf" class="value-text">00.0%</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card data-box">
+                        <small class="text-cyan d-block mb-1">LATENCY</small>
+                        <div id="val-time" class="value-text">0ms</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card data-box">
+                        <small class="text-cyan d-block mb-1">DETECTION</small>
+                        <div id="val-class" class="value-text">NULL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const previewImg = document.getElementById('preview-img');
+    const loaderUi = document.getElementById('loader-ui');
+    const scanLine = document.getElementById('scanLine');
+    const runBtn = document.getElementById('runBtn');
+    const logs = document.getElementById('logs');
+
+    // Natija maydonlari
+    const valConf = document.getElementById('val-conf');
+    const valTime = document.getElementById('val-time');
+    const valClass = document.getElementById('val-class');
+
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                previewImg.src = event.target.result;
+                previewImg.style.display = 'block';
+                loaderUi.style.display = 'none';
+                addLog(`File loaded: ${file.name}`);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    runBtn.addEventListener('click', async () => {
+        const file = imageInput.files[0];
+        if (!file) return addLog("Error: No file selected!", "red");
+
+        // UI animatsiyalarini boshlash
+        scanLine.style.display = 'block';
+        scanLine.style.animation = 'scanMove 3s infinite linear';
+        addLog("Sending to YOLOv8 Engine...");
+        document.getElementById('status-indicator').innerHTML = 'STATUS: <span class="text-warning">ANALYZING...</span>';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('http://localhost:8000/analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success" && result.data.length > 0) {
+                const detection = result.data[0];
+                valConf.innerText = (detection.confidence * 100).toFixed(1) + "%";
+                valTime.innerText = result.inference_time;
+                valClass.innerText = detection.class.toUpperCase();
+                addLog(`Inference complete: ${detection.class} found.`);
+            } else {
+                addLog("Warning: No objects detected.", "yellow");
+                valClass.innerText = "NONE";
+            }
+        } catch (err) {
+            addLog("Error: API Offline!", "red");
+        } finally {
+            scanLine.style.display = 'none';
+            document.getElementById('status-indicator').innerHTML = 'STATUS: <span class="text-success">READY</span>';
+        }
+    });
+
+    function addLog(text, color = "#00ffaa") {
+        const div = document.createElement('div');
+        div.style.color = color;
+        div.innerHTML = `> ${text}`;
+        logs.prepend(div);
+    }
+</script>
+</body>
+</html>
