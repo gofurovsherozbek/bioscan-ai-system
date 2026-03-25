@@ -249,7 +249,7 @@
         formData.append('file', file);
 
         try {
-            const response = await fetch('https://bioscan-ai-system.onrender.com', {
+            const response = await fetch('https://bioscan-ai-system.onrender.com/register', {
                 method: 'POST',
                 body: formData
             });
